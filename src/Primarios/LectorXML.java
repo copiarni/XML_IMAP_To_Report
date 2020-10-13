@@ -7,6 +7,7 @@ package Primarios;
 
 
 import DataItems.DataItem;
+import DataItems.DataTabla;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
@@ -19,6 +20,7 @@ import org.xml.sax.SAXException;
 import ElementosXML.CampoOrigen;
 import ElementosXML.ElementoXML;
 import ElementosXML.Folder;
+import ElementosXML.Join;
 import ElementosXML.RepoSASLibrary;
 import java.util.ArrayList;
 import org.w3c.dom.Element;
@@ -56,11 +58,13 @@ public class LectorXML {
        document= db.parse(xmlFile);
        document.getDocumentElement().normalize();       
        
-       buscaRepoSASLibrary();
-       buscaRelacionIds();
-       buscaDataItems();
+       buscaRepoSASLibrary();       
+       buscaRelacionIds();       
+       buscaDataItems();   
+       buscaUniones();
        Node nodeDirEstruc=document.getElementsByTagName("MapFolder").item(0);
        buscaDirectorios(nodeDirEstruc);
+       
     }
     
     /*Busca en el documento, elementos con nombre RepoSASLibrary*/
@@ -68,7 +72,7 @@ public class LectorXML {
         NodeList nodeRSList=document.getElementsByTagName("ReposSASLibrary");
         for (int i=0;i<nodeRSList.getLength();i++){
             Node node=nodeRSList.item(i);
-            String name=node.getAttributes().getNamedItem("name").getNodeValue();
+            String name=node.getAttributes().getNamedItem("name").getNodeValue();            
             String obj=node.getAttributes().getNamedItem("obj").getNodeValue();
             RepoSASLibrary r=new RepoSASLibrary(name,obj,node);
             XML_IMAP_To_Report.listaElementosXML.add(r);
@@ -81,18 +85,28 @@ public class LectorXML {
     private void buscaRelacionIds(){
         NodeList nodeRIList=document.getElementsByTagName("DataSourceTable");
         for(int i=0;i<nodeRIList.getLength();i++){
-            Node nodeDST=nodeRIList.item(i);
+            Node nodeDST=nodeRIList.item(i);            
             if(nodeDST.getAttributes().getNamedItem("dataSourceColumnMappings")!=null){
-                String parraf=nodeDST.getAttributes().getNamedItem("dataSourceColumnMappings").getNodeValue();
-                String[] listaRelacs=parraf.split(";");
-                for(String s:listaRelacs){
-                    String dataItemId=s.split(",")[0];
-                    String origenId=s.split(",")[1];
-                    for(ElementoXML el:XML_IMAP_To_Report.listaElementosXML){
-                        if (origenId.equals(el.getobj())){
-                            ((CampoOrigen)el).setDataItemsAsociados(dataItemId);
-                        }
+                String identity=nodeDST.getAttributes().getNamedItem("identity").getNodeValue();
+                String objTable=nodeDST.getAttributes().getNamedItem("obj").getNodeValue();
+                String reposTableId=nodeDST.getAttributes().getNamedItem("ref3").getNodeValue().split(":")[2];
+                DataTabla dt= new DataTabla(identity,reposTableId,objTable);
+                XML_IMAP_To_Report.listaDatTablas.add(dt);
+                for(ElementoXML el:XML_IMAP_To_Report.listaElementosXML){
+                    if(reposTableId.equals(el.getobj()) ){
+                        dt.setReposTable(el.getName());
+                        //ELIMINAR DESCRIBIR EN EL FUTURO
+                        //System.out.println(dt.describir());
                     }
+                    String parraf=nodeDST.getAttributes().getNamedItem("dataSourceColumnMappings").getNodeValue();
+                    String[] listaRelacs=parraf.split(";");
+                    for(String s:listaRelacs){
+                    String dataItemId=s.split(",")[0];
+                    String origenId=s.split(",")[1];  
+                        if (origenId.equals(el.getobj())){
+                                 ((CampoOrigen)el).setDataItemsAsociados(dataItemId);
+                        }                
+                    }   
                 }
             }
         }
@@ -105,6 +119,16 @@ public class LectorXML {
             Node nodeDI=nodeDIList.item(i);
             DataItem dai=new DataItem(nodeDI);
             XML_IMAP_To_Report.listaDataItems.add(dai);
+        }
+    }
+    
+    /*Busca en el documento, elementos con nombre Join (relaciones entre tablas)*/
+    private void buscaUniones(){
+        NodeList nodeRelList=document.getElementsByTagName("Join");
+        for(int i=0;i<nodeRelList.getLength();i++){
+            Node nodeRel=nodeRelList.item(i);
+            Join join=new Join(nodeRel);
+            XML_IMAP_To_Report.listaUniones.add(join);
         }
     }
     

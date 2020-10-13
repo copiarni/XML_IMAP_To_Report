@@ -86,12 +86,7 @@ public class Expresion {
             }
             
         }
-        
     
-        
-        
-        
-        
         String test="";
         for(int i=0;i<atributosExpresion.getLength();i++){
             test+=atributosExpresion.item(i).getNodeValue();

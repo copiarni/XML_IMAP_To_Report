@@ -18,6 +18,9 @@ public class ReposTable extends ElementoXML{
    ArrayList<CampoOrigen> listaCamposOrigen;
    private Node nodoDatos;
    private String fullName;
+   private String id;
+   private String tableName;
+
     
     public ReposTable(){
        super(); 
@@ -27,6 +30,7 @@ public class ReposTable extends ElementoXML{
         super(name, obj);
         this.nodoDatos=nodoDatos;
         this.fullName=fatherName+"."+name;
+        this.tableName=name;
         listaCamposOrigen=new ArrayList<>();
         setListaCamposOrigen();
     }
@@ -50,8 +54,13 @@ public class ReposTable extends ElementoXML{
                 XML_IMAP_To_Report.listaElementosXML.add(campoOrigen);
             }
         }
+        
+        
     }
     
+    public String getTableName(){
+        return this.tableName;
+    }
    
     
 }

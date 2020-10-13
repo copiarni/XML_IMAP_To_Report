@@ -7,9 +7,11 @@ package Primarios;
 
 
 import DataItems.DataItem;
+import DataItems.DataTabla;
 import java.util.ArrayList;
 import ElementosXML.ElementoXML;
 import ElementosXML.Folder;
+import ElementosXML.Join;
 
 
 /**
@@ -23,19 +25,29 @@ public class XML_IMAP_To_Report {
     public static ArrayList<ElementoXML> listaElementosXML;
     public static ArrayList<DataItem> listaDataItems;
     public static ArrayList<Folder> listaDirectorios;
+    public static ArrayList<Join> listaUniones;
+    public static ArrayList<DataTabla> listaDatTablas;
     
     /**
      * @param args the command line arguments
      */    
+    /*Para ejecutar desde IDE:
+        -Descomentar String archivo=C\\DIEGO..., String rutaSalida y printDetalles()
+        -Comentar el bloque del String archivo="" y todo el try catch
+      Antes de construir el paquete de ejecucion:
+        -Comentar String archivo=C\\DIEGO..., String rutaSalida y printDetalles()
+        -Descomentar el bloque del String archivo="" y todo el try catch*/
     public static void main(String[] args) throws Exception {
         
-        //String archivo="C:\\DIEGO\\Innova_Proyectos\\[TSB]\\IMAP_MDL.xml"; 
-        //String rutaSalida="C:\\DIEGO\\Innova_Proyectos\\[TSB]";
+        String archivo="C:\\DIEGO\\Innova_Proyectos\\[Naturgy]\\IMAP_NATURGY.xml";
+        String rutaSalida="C:\\DIEGO\\Innova_Proyectos\\[Naturgy]";
         listaElementosXML=new ArrayList<>();
         listaDataItems=new ArrayList<>();
-        listaDirectorios=new ArrayList<>();        
+        listaDirectorios=new ArrayList<>(); 
+        listaDatTablas=new ArrayList<>();
+        listaUniones=new ArrayList<>();
         
-        String archivo="",rutaSalida="";        
+        /*String archivo="",rutaSalida="";        
         try {
           archivo=args[0];
           rutaSalida=args[1];
@@ -43,15 +55,16 @@ public class XML_IMAP_To_Report {
             System.out.println("Error: Se necesitan parametros de entrada");
             System.out.println("String ruta+ficheroXml, String rutadestinoReportes");
             System.exit(0);
-        }
+        }*/
         
         lector=LectorXML.getInstance();
         lector.parseador(archivo);
         
 
-        //printDetalles();
+/*        printDetalles();*/
         EscritorCSV.volcadoCSV(rutaSalida);
         EscritorCSV.volcadoTXT(rutaSalida);
+        EscritorCSV.relaciones2CSV(rutaSalida);
     }
     
     /*Muestra mensajes en pantalla. Solo para desarrollo*/

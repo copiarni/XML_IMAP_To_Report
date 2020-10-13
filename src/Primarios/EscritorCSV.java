@@ -7,6 +7,7 @@ package Primarios;
 
 import DataItems.DataItem;
 import ElementosXML.Folder;
+import ElementosXML.Join;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 public class EscritorCSV {    
     
     static ArrayList<Folder> directorios;
+    static ArrayList<Join> relaciones;
     static ArrayList<DataItem> dataItems;
     
     /*Genera un documento CSV con los campos del Dataitem*/
@@ -29,7 +31,7 @@ public class EscritorCSV {
         FileWriter fW=new FileWriter(salidaCSV);
         PrintWriter pW = new PrintWriter(fW);
         /*Cabecera*/
-        pW.println("NOMBRE;FORMATO;EXPRESION,DESCRIPCION");
+        pW.println("NOMBRE;FORMATO;EXPRESION;DESCRIPCION");
         for(Folder f:directorios){
             String direct=f.getFolderName();
             if(f.getQtyDataItems()>0){
@@ -85,4 +87,20 @@ public class EscritorCSV {
        printWriter.close();
        System.out.println(rutaReportes+"\\EstructuraImap.txt Generado correctamente");
    }
+    
+    /*Genera un documento CSV con las relaciones de Imap*/
+    public static void relaciones2CSV(String rutaReportes)throws IOException{
+        String salidaCSV=rutaReportes+"\\MapaRelacionesImap.csv"; 
+        relaciones=XML_IMAP_To_Report.listaUniones;
+        
+        FileWriter fW=new FileWriter(salidaCSV);
+        PrintWriter pW = new PrintWriter(fW);
+        /*Cabecera*/
+        pW.println("COD_JOIN;LEFT_TABLE;RIGHT_TABLE;CARDINALITY;EXPRESSION");
+        for(Join j:relaciones){
+            pW.println(j.join2String());
+        }     
+        pW.close(); 
+        System.out.println(rutaReportes+"\\MapaRelacionesImap.csv Generado correctamente");
+    } 
 }
